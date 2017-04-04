@@ -26,17 +26,17 @@ n_steps = 28 # timesteps
 n_hidden = 512 # hidden layer num of features
 n_classes = 10 # MNIST total classes (0-9 digits)
 
- 
+# Define 1D conv&pooling op
 def conv1d(x, W, b, stride = 1):
     x = tf.nn.conv1d(x, W, stride, padding='SAME')
     x = tf.add(x, b)
     return x
 
 def maxpool1d(x, stride = 2):
-    x = tf.reshape(x, [-1, 1] + x.get_shape().as_list()[1:])
+    x = tf.expand_dims(x, axis=1)
     x = tf.nn.max_pool(x, [1, 1, stride, 1],
                         [1, 1, stride, 1], padding='SAME')
-    x = tf.reshape(x, [-1] + x.get_shape().as_list()[2:])
+    x = tf.squeeze(x, axis=1)
     return x
     
 # Define weights
@@ -76,6 +76,7 @@ def convnet1d(x, W, b):
 x = tf.placeholder("float", [None, n_steps, n_input])
 y = tf.placeholder("float", [None, n_classes])
 
+# Get convolution embedding feature
 feature_list = []
 for i in xrange(n_steps):
     x_step = x[:,i,:]
