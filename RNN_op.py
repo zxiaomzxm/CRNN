@@ -6,12 +6,7 @@ RNN by tensorflow basic op
 """
 
 '''
-A Recurrent Neural Network (LSTM) implementation example using TensorFlow library.
-This example is using the MNIST database of handwritten digits (http://yann.lecun.com/exdb/mnist/)
-Long Short Term Memory paper: http://deeplearning.cs.cmu.edu/pdfs/Hochreiter97_lstm.pdf
-
-Author: Aymeric Damien
-Project: https://github.com/aymericdamien/TensorFlow-Examples/
+Realize basic RNN by basic op and add ertra loss for MNIST classification
 '''
 
 import tensorflow as tf
