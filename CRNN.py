@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Apr  2 19:22:38 2017
+Convolution Recurrent Neural Network
 
 @author: zhaoxm
 """
@@ -70,8 +70,6 @@ def convnet1d(x, W, b):
         
         conv2 = conv1d(conv1, weights['wc2'], biases['bc2'])
         conv2 = maxpool1d(conv2, 2)
-        
-#        conv2 = tf.reshape(conv2, [-1, np.product(conv2.shape.as_list()[1:])])
     return conv2
     
 # tf Graph input

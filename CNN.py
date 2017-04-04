@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Apr  2 17:45:16 2017
+Convolution Neural Network
 
 @author: zhaoxm
 """
