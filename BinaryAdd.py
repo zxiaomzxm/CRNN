@@ -29,14 +29,14 @@ class BinaryAddDataset(object):
             # generate a simple addition problem (a + b = c)
             a_int = np.random.randint(self.largest_number/2) # int version
             a = self.int2binary[a_int] # binary encoding
-            a = a[::-1]
+#            a = a[::-1]
             b_int = np.random.randint(self.largest_number/2) # int version
             b = self.int2binary[b_int] # binary encoding
-            b = b[::-1]
+#            b = b[::-1]
             # true answer
             c_int = a_int + b_int
             c = self.int2binary[c_int]
-            c = c[::-1]
+#            c = c[::-1]
             
             x_batch[i] = np.concatenate([a.reshape([1, nsteps, 1]), \
                              b.reshape([1, nsteps, 1])], \
@@ -53,24 +53,31 @@ hidden_dim = 16
 output_dim = 1
 nsteps = binary_dim
 display_step = 100
-max_iter = 10000
+max_iter = 100000
 
 # tf part
 # forward pass
 x = tf.placeholder('float', [None, nsteps, input_dim]) # batchsize x nsteps x input_dim
 y = tf.placeholder('float', [None, nsteps, output_dim]) # batchsize x nsteps x output_dim
 
-W = tf.Variable(tf.random_normal([hidden_dim, output_dim]), name='W_out')
+W = tf.Variable(tf.random_normal([2*hidden_dim, output_dim]), name='W_out')
 b = tf.Variable(tf.random_normal([output_dim]), name='b_out')
 
 x_tmp = tf.unstack(x, axis=1)
 
-cell = rnn.LSTMCell(hidden_dim, activation=tf.tanh)
-outputs, state = rnn.static_rnn(cell, x_tmp, dtype=tf.float32)
+#cell = rnn.LSTMCell(hidden_dim, activation=tf.tanh)
+#outputs, state = rnn.static_rnn(cell, x_tmp, dtype=tf.float32)
+
+# Forward direction cell
+lstm_fw_cell = rnn.BasicLSTMCell(hidden_dim, forget_bias=1.0)
+# Backward direction cell
+lstm_bw_cell = rnn.BasicLSTMCell(hidden_dim, forget_bias=1.0)
+outputs, _, _ = rnn.static_bidirectional_rnn(lstm_fw_cell, lstm_bw_cell, x_tmp,
+                                              dtype=tf.float32)
 
 outputs = tf.stack(outputs)
 outputs = tf.transpose(outputs, [1, 0, 2])
-outputs = tf.reshape(outputs, [-1, hidden_dim])
+outputs = tf.reshape(outputs, [-1, 2*hidden_dim])
 y_pred = tf.sigmoid(tf.matmul(outputs, W) + b)
 y_pred = tf.reshape(y_pred, [-1, nsteps, output_dim])
                   
