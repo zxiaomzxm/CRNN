@@ -22,13 +22,14 @@ row as a sequence of pixels. Because MNIST image shape is 28*28px, we will then
 handle 28 sequences of 28 steps for every sample.
 '''
 
+tf.reset_default_graph()
 # Parameters
 learning_rate = 0.001
 training_iters = 300000
 batch_size = 128
 display_step = 100
 loss_len = 1
-useRCN = True
+useRCN = False
 
 # Network Parameters
 n_input = 28 # MNIST data input (img shape: 28*28)
@@ -152,14 +153,27 @@ if useRCN:
 else:
     state = tf.zeros([tf.shape(x)[0], n_hidden])
     
-outputs = []
-for i in xrange(n_steps):
-    x_i = x[:,i,:]
-    if useRCN:
-        output, state = RNNConvCell(x_i, state)
-    else:
-        output, state = RNNCell(x_i, state)
-    outputs.append(output)
+#outputs = []
+#for i in xrange(n_steps):
+#    x_i = x[:,i,:]
+#    if useRCN:
+#        output, state = RNNConvCell(x_i, state)
+#    else:
+#        output, state = RNNCell(x_i, state)
+#    outputs.append(output)
+
+"""
+Use tf.scan instead of naive for loop
+Remark: scan->a(t) = fn(a(t-1), x), the first param fn(a,x) in scan function, 
+'a' stands for a recursive op and 'x'stands for a input at some time, 
+but in this example, we need cell(rnn_input, state) as scan function, 
+so we use lambda function transform Cell(rnn_input, state) to 
+Cell(state, rnn_input) with responding to fn(a, x) in scan function.
+And notes that Cell function return (output, state), so we actuallly need 
+send a[1] which means state to the fn's first input
+"""
+outputs = tf.scan(lambda a, x: RNNCell(x, a[1]), tf.transpose(x, [1, 0, 2]), 
+                  initializer=(state, state))[0]
     
     
 # Linear activation, using rnn inner loop last output
@@ -209,3 +223,5 @@ with tf.Session() as sess:
     test_label = mnist.test.labels[:test_len]
     print("Testing Accuracy:", \
         sess.run(accuracy, feed_dict={x: test_data, y: test_label}))
+
+tf.reset_default_graph()

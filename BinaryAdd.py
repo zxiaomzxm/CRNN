@@ -10,6 +10,7 @@ import tensorflow as tf
 from tensorflow.contrib import rnn
 import numpy as np
 
+tf.reset_default_graph()
 # training dataset generation
 class BinaryAddDataset(object):
     def __init__(self, binary_dim=8):
@@ -53,7 +54,7 @@ hidden_dim = 16
 output_dim = 1
 nsteps = binary_dim
 display_step = 100
-max_iter = 100000
+max_iter = 5000
 
 # tf part
 # forward pass
@@ -101,3 +102,5 @@ with tf.Session() as sess:
         
 for v in tf.global_variables():
     print("%s : %s") % (v.name,v.get_shape())
+
+tf.reset_default_graph()
